@@ -22,10 +22,19 @@ def tokeniza_par(ex):
     tgt = [start_id] + tok.encode(ex["pt"], add_special_tokens=False)[:MAX_SEQ - 2] + [eos_id]
     return src, tgt
 
-print("total:", len(train_raw))
-print("exemplo:", train_raw[0]["translation"]["en"])
-print("traducao:", train_raw[0]["translation"]["pt"])
+def pad_batch(seqs):
+    ml = max(len(s) for s in seqs)
+    return [s + [pad_id] * (ml - len(s)) for s in seqs]
 
-s, t = tokeniza_par(train_raw[0]["translation"])
-print("tokens src:", s[:10])
-print("tokens tgt:", t[:10])
+src_all, tgt_all = [], []
+for ex in train_raw:
+    s, t = tokeniza_par(ex["translation"])
+    src_all.append(s)
+    tgt_all.append(t)
+
+src_padded = torch.tensor(pad_batch(src_all))
+tgt_padded = torch.tensor(pad_batch(tgt_all))
+
+print("total:", len(train_raw))
+print(f"src shape: {src_padded.shape}")
+print(f"tgt shape: {tgt_padded.shape}")
