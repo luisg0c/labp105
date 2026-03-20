@@ -51,3 +51,19 @@ class FeedForward(nn.Module):
 
     def forward(self, x):
         return self.w2(F.relu(self.w1(x)))
+
+
+class EncoderBlock(nn.Module):
+    def __init__(self, d_model, n_heads, d_ff):
+        super().__init__()
+        self.attn = MultiHeadAttention(d_model, n_heads)
+        self.ff = FeedForward(d_model, d_ff)
+        self.norm1 = nn.LayerNorm(d_model)
+        self.norm2 = nn.LayerNorm(d_model)
+
+    def forward(self, x):
+        att = self.attn(x, x, x)
+        x = self.norm1(x + att)
+        ff = self.ff(x)
+        x = self.norm2(x + ff)
+        return x
