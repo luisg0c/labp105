@@ -67,3 +67,23 @@ class EncoderBlock(nn.Module):
         ff = self.ff(x)
         x = self.norm2(x + ff)
         return x
+
+
+class DecoderBlock(nn.Module):
+    def __init__(self, d_model, n_heads, d_ff):
+        super().__init__()
+        self.self_attn = MultiHeadAttention(d_model, n_heads)
+        self.cross_attn = MultiHeadAttention(d_model, n_heads)
+        self.ff = FeedForward(d_model, d_ff)
+        self.norm1 = nn.LayerNorm(d_model)
+        self.norm2 = nn.LayerNorm(d_model)
+        self.norm3 = nn.LayerNorm(d_model)
+
+    def forward(self, y, enc_out, mask=None):
+        att = self.self_attn(y, y, y, mask)
+        y = self.norm1(y + att)
+        cross = self.cross_attn(y, enc_out, enc_out)
+        y = self.norm2(y + cross)
+        ff = self.ff(y)
+        y = self.norm3(y + ff)
+        return y
