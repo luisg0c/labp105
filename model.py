@@ -41,3 +41,13 @@ class MultiHeadAttention(nn.Module):
 
         att = att.transpose(1, 2).contiguous().view(batch, -1, self.n_heads * self.d_k)
         return self.wo(att)
+
+
+class FeedForward(nn.Module):
+    def __init__(self, d_model, d_ff):
+        super().__init__()
+        self.w1 = nn.Linear(d_model, d_ff)
+        self.w2 = nn.Linear(d_ff, d_model)
+
+    def forward(self, x):
+        return self.w2(F.relu(self.w1(x)))
