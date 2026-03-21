@@ -87,3 +87,33 @@ class DecoderBlock(nn.Module):
         ff = self.ff(y)
         y = self.norm3(y + ff)
         return y
+
+
+class Transformer(nn.Module):
+    def __init__(self, vocab_size, d_model, n_heads, n_layers, d_ff, max_seq):
+        super().__init__()
+        self.emb = nn.Embedding(vocab_size, d_model)
+        self.pos_emb = nn.Embedding(max_seq, d_model)
+        self.enc_blocks = nn.ModuleList([EncoderBlock(d_model, n_heads, d_ff) for _ in range(n_layers)])
+        self.dec_blocks = nn.ModuleList([DecoderBlock(d_model, n_heads, d_ff) for _ in range(n_layers)])
+        self.proj = nn.Linear(d_model, vocab_size)
+
+    def forward(self, src, tgt):
+        enc_out = self.encode(src)
+        mask = create_causal_mask(tgt.size(1)).to(tgt.device)
+        x = self.emb(tgt) + self.pos_emb(torch.arange(tgt.size(1), device=tgt.device))
+        for block in self.dec_blocks:
+            x = block(x, enc_out, mask)
+        return self.proj(x)
+
+    def encode(self, src):
+        x = self.emb(src) + self.pos_emb(torch.arange(src.size(1), device=src.device))
+        for block in self.enc_blocks:
+            x = block(x)
+        return x
+
+    def decode(self, tgt, enc_out, mask):
+        x = self.emb(tgt) + self.pos_emb(torch.arange(tgt.size(1), device=tgt.device))
+        for block in self.dec_blocks:
+            x = block(x, enc_out, mask)
+        return self.proj(x)
