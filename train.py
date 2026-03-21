@@ -45,7 +45,7 @@ from model import Transformer, D_MODEL, N_HEADS, N_LAYERS, D_FF, MAX_SEQ as MODE
 vocab_size = tok.vocab_size
 model = Transformer(vocab_size, D_MODEL, N_HEADS, N_LAYERS, D_FF, MODEL_MAX_SEQ).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=LR)
-criterion = nn.CrossEntropyLoss()
+criterion = nn.CrossEntropyLoss(ignore_index=pad_id)
 
 if __name__ == "__main__":
     n_params = sum(p.numel() for p in model.parameters())
