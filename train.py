@@ -74,3 +74,20 @@ if __name__ == "__main__":
 
         avg = total_loss / max(n_batches, 1)
         print(f"  epoca {epoch+1:>2}/{EPOCHS}  loss: {avg:.4f}")
+
+    print("\n--- overfitting test ---")
+    ov_src = src_padded[:5]
+    ov_tgt = tgt_padded[:5]
+    ov_opt = torch.optim.Adam(model.parameters(), lr=LR)
+
+    for ep in range(OVERFIT_EPOCHS):
+        model.train()
+        ov_opt.zero_grad()
+        tgt_in = ov_tgt[:, :-1]
+        tgt_out = ov_tgt[:, 1:]
+        logits = model(ov_src, tgt_in)
+        loss = criterion(logits.reshape(-1, vocab_size), tgt_out.reshape(-1))
+        loss.backward()
+        ov_opt.step()
+        if (ep + 1) % 20 == 0:
+            print(f"overfit {ep+1}/{OVERFIT_EPOCHS}  loss: {loss.item():.4f}")
