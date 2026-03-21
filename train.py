@@ -91,3 +91,24 @@ if __name__ == "__main__":
         ov_opt.step()
         if (ep + 1) % 20 == 0:
             print(f"overfit {ep+1}/{OVERFIT_EPOCHS}  loss: {loss.item():.4f}")
+
+    print("\n--- geracao ---")
+    model.train(False)
+    from model import create_causal_mask
+    with torch.no_grad():
+        for idx in range(min(3, len(ov_src))):
+            enc_out = model.encode(ov_src[idx:idx+1])
+            gen = torch.tensor([[start_id]], device=device)
+            max_len = ov_tgt.size(1) + 5
+            for _ in range(max_len):
+                mask = create_causal_mask(gen.size(1)).to(device)
+                logits = model.decode(gen, enc_out, mask)
+                next_id = logits[0, -1].argmax().item()
+                gen = torch.cat([gen, torch.tensor([[next_id]], device=device)], dim=1)
+                if next_id == eos_id:
+                    break
+            gerada = tok.decode(gen[0].tolist(), skip_special_tokens=True)
+            real = tok.decode(ov_tgt[idx].tolist(), skip_special_tokens=True)
+            print(f"real:   {real}")
+            print(f"gerada: {gerada}")
+            print()
