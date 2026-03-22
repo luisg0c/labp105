@@ -99,8 +99,7 @@ if __name__ == "__main__":
         for idx in range(min(3, len(ov_src))):
             enc_out = model.encode(ov_src[idx:idx+1])
             gen = torch.tensor([[start_id]], device=device)
-            max_len = ov_tgt.size(1) + 5
-            for _ in range(max_len):
+            for _ in range(MAX_SEQ):
                 mask = create_causal_mask(gen.size(1)).to(device)
                 logits = model.decode(gen, enc_out, mask)
                 next_id = logits[0, -1].argmax().item()
