@@ -49,8 +49,8 @@ criterion = nn.CrossEntropyLoss(ignore_index=pad_id)
 
 if __name__ == "__main__":
     n_params = sum(p.numel() for p in model.parameters())
-    print(f"\nvocab: {vocab_size}  params: {n_params}")
-    print(f"batches por epoca: {len(src_padded) // BATCH_SIZE}")
+    print(f"\nvocab: {vocab_size}  params: {n_params}  device: {device}")
+    print(f"batches por epoca: {len(src_padded) // BATCH_SIZE}\n")
 
     for epoch in range(EPOCHS):
         model.train()
