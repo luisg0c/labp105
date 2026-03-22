@@ -7,7 +7,7 @@ EPOCHS = 20
 BATCH_SIZE = 32
 LR = 1e-4
 MAX_SEQ = 64
-OVERFIT_EPOCHS = 100
+OVERFIT_EPOCHS = 300
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
