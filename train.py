@@ -38,7 +38,6 @@ src_padded = torch.tensor(pad_batch(src_all)).to(device)
 tgt_padded = torch.tensor(pad_batch(tgt_all)).to(device)
 
 print(f"dados: {len(train_raw)} pares, src {src_padded.shape}, tgt {tgt_padded.shape}")
-print("device:", device)
 
 from model import Transformer, D_MODEL, N_HEADS, N_LAYERS, D_FF, MAX_SEQ as MODEL_MAX_SEQ
 
